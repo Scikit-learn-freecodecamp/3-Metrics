@@ -5,6 +5,7 @@
 3. [GridSearchCV](#schema3)
 4. [Min(recall_score, precision_score)](#schema4)
 5. [Uso de modelos de detección  Outlier](#schema5)
+6. [Documentación](#schema6)
 
 <hr>
 
