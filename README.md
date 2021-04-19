@@ -1,6 +1,10 @@
 # 3 Metrics
 
 1. [Importar librerías ](#schema1)
+2. [LogisticRegression](#schema2)
+3. [GridSearchCV](#schema3)
+4. [Min(recall_score, precision_score)](#schema4)
+5. [Uso de modelos de detección  Outlier](#schema5)
 
 <hr>
 
@@ -196,4 +200,5 @@ plt.legend();
 
 # 6. Documentación
 Dataset: https://www.kaggle.com/mlg-ulb/creditcardfraud
+
 https://www.youtube.com/watch?v=0B5eIE_1vpU&t=385s
