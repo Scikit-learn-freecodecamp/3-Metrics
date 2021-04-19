@@ -1,17 +1,30 @@
-# 3-Metrics
+# 3 Metrics
 
+1. [Importar librerías ](#schema1)
 
+<hr>
 
+<a name="schema1"></a>
 
+# 1. Importar librerías y cargar los datos
 
 ~~~python
+import numpy as np
+import pandas as pd
+import matplotlib.pylab as plt
+
+df  = pd.read_csv("./data/creditcard.csv")[:80_000]
+~~~
+### Obtener los train
+~~~Python
 X = df.drop(columns=['Time', 'Amount', 'Class']).values
 y = df['Class'].values
-f"Shapes of X={X.shape} y={y.shape}, #Fraud Cases={y.sum()}"
 ~~~
+<hr>
 
+<a name="schema2"></a>
 
-# LogisticRegression
+# 2. LogisticRegression
 
 ~~~python
 from sklearn.linear_model import LogisticRegression
@@ -26,7 +39,11 @@ mod.fit(X, y).predict(X).sum()
 171
 ~~~
 
-# GridSearchCV
+<hr>
+
+<a name="schema3"></a>
+
+# 3. GridSearchCV
 
 ~~~python
 from sklearn.model_selection import GridSearchCV
@@ -88,9 +105,11 @@ plt.savefig("./images/test_train.png")
 ~~~
 ![img](./images/test_train.png)
 
+<hr>
 
+<a name="schema4"></a>
 
-# Min(recall_score, precision_score)
+# 4. Min(recall_score, precision_score)
 ~~~python
 def min_recall_precision(y_true, y_pred):
     recall = recall_score(y_true, y_pred)
@@ -113,27 +132,68 @@ grid.fit(X, y)
 ![img](./images/min.png)
 ![img](./images/mean_min.png)
 
+<hr>
+
+<a name="schema5"></a>
+
+
+# 5. Uso de modelos de detección  Outlier
+
+~~~python
+from collections import Counter
+from sklearn.ensemble import IsolationForest
+mod = IsolationForest().fit(X)
+Counter(mod.predict(X))
+Counter({1: 76910, -1: 3090})
+~~~
+
+1:76910, la cantidad de no outlier
+-1:3090 cantiade de outlier
+
+Tenemos que usar otras funciones, porque las metricas anteriomente usadas solo aceptan los valores `0/1`
+
+~~~python
+def outlier_precision(mod, X, y):
+    preds = mod.predict(X)
+    return precision_score(y, np.where(preds == -1, 1, 0))
+
+def outlier_recall(mod, X, y):
+    preds = mod.predict(X)
+    return recall_score(y, np.where(preds == -1, 1, 0))
+
+grid = GridSearchCV(
+    estimator=IsolationForest(),
+    param_grid={'contamination': np.linspace(0.001, 0.02, 10)},
+    scoring={'precision': outlier_precision, 
+             'recall': outlier_recall},
+    refit='precision',
+    cv=5,
+    n_jobs=-1
+)
+grid.fit(X, y);
+
+plt.figure(figsize=(12, 4))
+df_results = pd.DataFrame(grid.cv_results_)
+for score in ['mean_test_recall', 'mean_test_precision']:
+    plt.plot(df_results['param_contamination'], 
+             df_results[score], 
+             label=score)
+plt.legend();
+~~~
+
+![img](./images/outlier.png)
+![img](./images/004.png)
 
 
 
 
 
 
+<hr>
+
+<a name="schema6"></a>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Documentación
+# 6. Documentación
 Dataset: https://www.kaggle.com/mlg-ulb/creditcardfraud
+https://www.youtube.com/watch?v=0B5eIE_1vpU&t=385s
